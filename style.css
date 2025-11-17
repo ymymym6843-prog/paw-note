@@ -184,19 +184,17 @@ textarea {
 }
 
 .filter-item.filter-search {
-  flex-grow: 1; /* 남는 공간을 모두 차지 */
-  flex-shrink: 1; /* 공간이 부족할 때 줄어들도록 허용 */
-  min-width: 80px; /* 최소 너비 보장 */
+  flex: 1 1 auto; /* 유연하게 늘어나고 줄어들도록 설정 */
+  min-width: 60px; /* 최소 너비 보장 */
 }
 
 .filter-item.filter-date,
 .filter-item.filter-weather {
-  flex-basis: auto; /* 내용에 맞게 너비 자동 조절 */
+  flex: 0 0 auto; /* 고유 너비를 유지하고 줄어들지 않음 */
 }
 
 .filter-item.filter-emotion {
-  flex-shrink: 0; /* 줄어들지 않도록 고정 */
-  width: 180px; /* 너비 고정 */
+  flex: 0 0 180px; /* 너비를 180px로 고정하고 줄어들지 않음 */
   justify-content: center; /* 중앙 정렬 */
 }
 

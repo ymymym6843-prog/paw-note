@@ -802,7 +802,7 @@ function handleMouseMove(e) {
   }
 }
 
-function handleMouseUp(e) {
+function handleUp(e) {
   if (canvasState.mode === "draw") {
     handleDrawEnd(e);
   } else if (canvasState.mode === "sticker") {
@@ -810,10 +810,10 @@ function handleMouseUp(e) {
   }
 }
 
-canvas.addEventListener("mousedown", handleMouseDown);
-canvas.addEventListener("mousemove", handleMouseMove);
-canvas.addEventListener("mouseup", handleMouseUp);
-canvas.addEventListener("mouseleave", handleMouseUp);
+canvas.addEventListener("mousedown", handleMouseDown, { passive: false });
+canvas.addEventListener("mousemove", handleMouseMove, { passive: false });
+canvas.addEventListener("mouseup", handleUp, { passive: false });
+canvas.addEventListener("mouseleave", handleUp, { passive: false });
 
 canvas.addEventListener(
   "touchstart",
@@ -842,7 +842,7 @@ canvas.addEventListener(
 canvas.addEventListener(
   "touchend",
   (e) => {
-    handleMouseUp(e);
+    handleUp(e);
   },
   { passive: false }
 );
