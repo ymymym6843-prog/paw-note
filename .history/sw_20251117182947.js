@@ -30,6 +30,7 @@ const urlsToCache = [ // 경로 수정
   './images/cat/fur_short_silver.png',
   './images/cat/fur_siamese.png',
   './images/cat/fur_tuxedo.png',
+  './images/cat/fur_white.png'
   './images/cat/fur_white.png',
   // 누락된 고양이 파츠 이미지 추가
   './images/cat/eyes_amber.png',
