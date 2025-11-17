@@ -723,6 +723,12 @@ body.dark .thumb {
   gap: 8px;
 }
 
+.empty-grid-message {
+  grid-column: 1 / -1; /* 그리드의 모든 칸을 차지하도록 설정 */
+  text-align: center;
+  margin-top: 8px;
+}
+
 .photo-item {
   position: relative;
   border-radius: 14px;

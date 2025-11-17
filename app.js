@@ -932,9 +932,9 @@ function renderList() {
 
     const thumb = document.createElement("div");
     thumb.className = "thumb";
-    if (item.imageData) {
+    if (item.baseImageData) { // BUG FIX: imageData -> baseImageData
       const img = document.createElement("img");
-      img.src = item.imageData;
+      img.src = item.baseImageData;
       thumb.appendChild(img);
     } else {
       const img = document.createElement("img");
@@ -980,9 +980,8 @@ function renderPhotoGrid() {
 
   if (diaries.length === 0) {
     const empty = document.createElement("p");
-    empty.className = "small";
+    empty.className = "small empty-grid-message"; // 클래스 추가로 스타일 관리
     empty.textContent = "아직 저장된 그림이 없어요.";
-    empty.style.marginTop = "8px"; // 여백 추가
     diaryGrid.appendChild(empty);
   } else {
     diaries.forEach((item) => {
@@ -1137,7 +1136,7 @@ exportTxtBtn.addEventListener("click", () => {
     text += `감정: ${emoLabel}\n`;
     text += `날씨: ${weatherMeta.label}\n`;
     text += `내용:\n${item.content || ""}\n`;
-    text += `그림: ${item.imageData ? "[이미지 있음]" : "없음"}\n`;
+    text += `그림: ${item.baseImageData ? "[이미지 있음]" : "없음"}\n`; // BUG FIX: imageData -> baseImageData
     text += "------------------------\n\n";
   });
 
@@ -1189,14 +1188,14 @@ exportPdfBtn.addEventListener("click", () => {
       }
     });
 
-    if (item.imageData) {
+    if (item.baseImageData) { // BUG FIX: imageData -> baseImageData
       if (y > 220) {
         doc.addPage();
         y = 10;
       }
       doc.text("그림:", 10, y);
       y += 4;
-      doc.addImage(item.imageData, "PNG", 10, y, 60, 60);
+      doc.addImage(item.baseImageData, "PNG", 10, y, 60, 60);
       y += 66;
     }
 
