@@ -842,7 +842,10 @@ canvas.addEventListener(
 canvas.addEventListener(
   "touchend",
   (e) => {
-    handleUp(e);
+    // handleUp(e); // handleUp은 마우스 이벤트에만 사용하도록 분리
+    if (canvasState.mode === "draw") {
+      handleDrawEnd(e); // 그리기 종료 및 상태 저장
+    }
     if (canvasState.mode === "sticker") {
       handleStickerEnd(e); // 스티커 추가 후 상태 저장을 위해 호출
     }
