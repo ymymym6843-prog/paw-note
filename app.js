@@ -842,7 +842,7 @@ canvas.addEventListener(
 canvas.addEventListener(
   "touchend",
   (e) => {
-    // handleUp(e); // handleUp은 마우스 이벤트에만 사용하도록 분리
+    // handleUp(e); // handleUp은 마우스 이벤트에만 사용하도록 분리.
     if (canvasState.mode === "draw") {
       handleDrawEnd(e); // 그리기 종료 및 상태 저장
     }
