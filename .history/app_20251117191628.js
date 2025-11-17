@@ -975,6 +975,7 @@ function renderPhotoGrid() {
 
   diaryGrid.innerHTML = "";
   const diaries = loadDiaries()
+    .filter((item) => item.imageData)
     .filter((item) => item.baseImageData) // BUG FIX: imageData -> baseImageData
     .sort((a, b) => b.date.localeCompare(a.date));
 
@@ -989,6 +990,7 @@ function renderPhotoGrid() {
       const photo = document.createElement("div");
       photo.className = "photo-item";
       const img = document.createElement("img");
+      img.src = item.imageData;
       img.src = item.baseImageData; // BUG FIX: imageData -> baseImageData
       img.alt = `${item.date} diary drawing`;
       photo.appendChild(img);
