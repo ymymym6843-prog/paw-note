@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Paw Note</title>
+
+  <!-- 폰트 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- jsPDF (PDF 내보내기용) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- 메인 JS -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <!-- 🔐 PIN 잠금 화면 -->
+  <div id="lockScreen" class="card lock-card">
+    <h2>Paw Note 잠금</h2>
+    <div id="lockStepSetup">
+      <p class="small">처음이라면 PIN을 설정해 주세요. (숫자 4자리 추천)</p>
+      <div class="row">
+        <label for="newPin">새 PIN</label>
+        <input type="password" id="newPin" maxlength="10" />
+      </div>
+      <div class="row">
+        <label for="newPinConfirm">확인</label>
+        <input type="password" id="newPinConfirm" maxlength="10" />
+      </div>
+      <div class="btn-row">
+        <button id="setPinBtn" class="primary">PIN 설정</button>
+      </div>
+    </div>
+
+    <div id="lockStepEnter" style="display:none;">
+      <p class="small">PIN을 입력해서 Paw Note를 열어주세요.</p>
+      <div class="row">
+        <label for="enterPin">PIN</label>
+        <input type="password" id="enterPin" maxlength="10" />
+      </div>
+      <div class="btn-row">
+        <button id="unlockBtn" class="primary">잠금 해제</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📓 Paw Note 앱 -->
+  <div id="app" class="card app-card">
+    <!-- 상단 헤더 -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="images/paw_logo.png" alt="Paw Note Logo">
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">Paw Note</div>
+          <div class="brand-subtitle">Your Daily Paw Moments</div>
+        </div>
+      </div>
+      <button id="themeToggle" class="outline small-btn">🌙 다크모드</button>
+    </header>
+
+    <!-- =======================
+         👣 탭 뷰 : Home / Calendar / Photos / More
+         ======================= -->
+
+    <!-- 🏠 HOME 탭 -->
+    <div id="view-home" class="tab-view active">
+      <!-- 🔍 필터바 -->
+      <div class="row filter-row">
+        <!-- 검색 -->
+        <div class="filter-item filter-search">
+          <label for="searchInput">Search</label>
+          <div class="search-wrapper">
+            <input type="text" id="searchInput" aria-label="Search" />
+          </div>
+        </div>
+        <!-- 날짜 -->
+        <div class="filter-item filter-date">
+          <label for="dateInput">Date</label>
+          <input type="date" id="dateInput" />
+        </div>
+        <!-- 날씨 -->
+        <div class="filter-item filter-weather">
+          <label for="weatherSelect">Weather</label>
+          <select id="weatherSelect">
+            <option value="sunny">☀️ 맑음</option>
+            <option value="cloudy">⛅ 흐림</option>
+            <option value="rainy">🌧️ 비</option>
+            <option value="snowy">❄️ 눈</option>
+            <option value="stormy">⛈️ 폭풍</option>
+          </select>
+        </div>
+        <!-- 감정(발바닥) -->
+        <div class="filter-item filter-emotion">
+          <label>Emotion</label>
+          <div id="pawRating" class="paw-rating">
+            <button type="button" class="paw" data-value="1">
+              <img src="images/paw_foot.png" alt="1 paw" />
+            </button>
+            <button type="button" class="paw" data-value="2">
+              <img src="images/paw_foot.png" alt="2 paws" />
+            </button>
+            <button type="button" class="paw" data-value="3">
+              <img src="images/paw_foot.png" alt="3 paws" />
+            </button>
+            <button type="button" class="paw" data-value="4">
+              <img src="images/paw_foot.png" alt="4 paws" />
+            </button>
+            <button type="button" class="paw" data-value="5">
+              <img src="images/paw_foot.png" alt="5 paws" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 텍스트 일기 (타이틀 텍스트는 생략) -->
+      <div class="notepaper">
+        <textarea
+          id="contentInput"
+          placeholder=" 오늘 하루는 어땠나요? "
+        ></textarea>
+      </div>
+
+      <!-- 그림일기 (타이틀 텍스트는 생략) -->
+      <div id="drawingContainer">
+        <!-- 모드 버튼 -->
+        <div class="toolbar">
+          <span>모드</span>
+          <button id="drawModeBtn" class="outline mode-btn active">✏️ 그리기</button>
+          <button id="stickerModeBtn" class="outline mode-btn">⭐ 스티커</button>
+          <span class="small" id="modeHint">손가락/마우스로 자유롭게 그리기</span>
+        </div>
+
+        <canvas id="drawingCanvas"></canvas>
+
+        <!-- 그리기 툴 -->
+        <div class="toolbar">
+          <label>색상
+            <input type="color" id="colorPicker" value="#c05677" />
+          </label>
+          <label>두께
+            <input type="range" id="brushSize" min="1" max="20" value="4" />
+          </label>
+          <button id="undoBtn" class="outline">↩ 되돌리기</button>
+          <button id="redoBtn" class="outline">↪ 다시하기</button>
+          <button id="clearCanvasBtn" class="outline">전체 지우기</button>
+          <button id="exportPngBtn" class="primary ghost">PNG 저장</button>
+        </div>
+
+        <!-- 스티커 툴 -->
+        <div class="toolbar">
+          <span>스티커</span>
+          <div class="sticker-panel-buttons">
+            <button
+              class="outline sticker-emoji-btn"
+              data-sticker="paw_foot"
+              aria-label="Paw foot sticker"
+            >
+              <img src="images/paw_foot.png" alt="Paw foot" class="sticker-paw-icon" />
+            </button>
+            <button class="outline sticker-emoji-btn" data-emoji="😺">😺</button>
+            <button class="outline sticker-emoji-btn" data-emoji="⭐">⭐</button>
+            <button class="outline sticker-emoji-btn" data-emoji="☕">☕</button>
+            <button class="outline sticker-emoji-btn" data-emoji="🌸">🌸</button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <span>PNG 스티커</span>
+          <input type="file" id="stickerUpload" accept="image/png" style="display:none;">
+          <button id="uploadStickerBtn" class="outline">PNG 불러오기</button>
+          <button id="deleteStickerBtn" class="outline">선택 삭제</button>
+          <span class="small">(스티커 클릭 → 이동 / 우하단 모서리 → 크기 조절)</span>
+        </div>
+
+        <p class="small hint">
+          PNG 파일을 캔버스로 바로 <b>드래그&드롭</b>하면 젤리 스티커처럼 붙어요 
+        </p>
+      </div>
+
+      <!-- 버튼들 -->
+      <div class="btn-row">
+        <button id="saveBtn" class="primary" style="flex:1;">오늘 기록 저장하기</button>
+        <button id="newEntryBtn" class="outline">새 일기</button>
+      </div>
+
+      <!-- 내보내기 -->
+      <div class="section-title">내보내기 / 백업</div>
+      <div class="btn-row">
+        <button id="exportTxtBtn" class="outline">텍스트 백업</button>
+        <button id="exportPdfBtn" class="outline">PDF 백업</button>
+      </div>
+      <p class="small">
+        백업 파일은 본인만 보이는 곳에 잘 보관해 주세요. (Paw Note 비밀 기록장✨)
+      </p>
+
+      <!-- 목록 -->
+      <div class="list-title">📚 지난 Paw Note</div>
+      <ul id="list"></ul>
+    </div>
+
+    <!-- 📅 CALENDAR 탭 -->
+    <div id="view-calendar" class="tab-view">
+      <div class="section-title">캘린더</div>
+      <div class="calendar-header">
+        <button id="prevMonthBtn" class="outline small-btn">◀</button>
+        <div id="calendarTitle" class="calendar-title"></div>
+        <button id="nextMonthBtn" class="outline small-btn">▶</button>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+      <p class="small">
+        젤리 표시가 있는 날짜는 일기가 있는 날이에요. 날짜를 탭하면 Home에서 그날 일기가 열립니다.
+      </p>
+    </div>
+
+    <!-- 📷 PHOTOS 탭 -->
+    <div id="view-photos" class="tab-view">
+      <div class="setting-group">
+        <h3>Collection</h3>
+        <p class="small">그림이나 사진이 있는 일기만 모아서 보여줘요. 썸네일을 탭하면 해당 일기로 이동합니다.</p>
+        <div id="photoGridDiary" class="photo-grid"></div>
+      </div>
+      <div class="setting-group">
+        <h3>My Cat</h3>
+        <p class="small">More 탭에서 직접 만든 고양이들이에요.</p>
+        <div id="photoGridCat" class="photo-grid"></div>
+      </div>
+    </div>
+
+    <!-- ✨ MORE 탭 -->
+    <div id="view-more" class="tab-view">
+      <div class="setting-group">
+        <h3>Preview</h3>
+        <p class="small">나만의 고양이를 만들어 갤러리에 저장해 보세요!</p>
+        <div class="cat-customizer">
+            <canvas id="catPreviewCanvas" width="300" height="300"></canvas>
+            <div id="catControls" class="cat-controls-grid">
+              <!-- JS로 동적 생성 -->
+            </div>
+            <button id="saveCatBtn" class="btn primary">Save</button>
+        </div>
+      </div>
+
+      <!-- 2. 발바닥 통계 -->
+      <div class="more-card stats-card">
+        <div class="stats-header">
+          <h3>Paw Mood Stats</h3>
+          <div class="stats-toggle">
+            <button class="outline small-btn stats-btn active" data-period="week">Weekly</button>
+            <button class="outline small-btn stats-btn" data-period="month">Monthly</button>
+          </div>
+        </div>
+        <div id="statsChart" class="stats-chart"></div>
+        <p class="small" id="statsSummary">
+          최근 일기를 기반으로 발바닥 기분을 계산합니다.
+        </p>
+      </div>
+
+      <!-- 3. 데이터 관리 -->
+      <div class="more-card">
+        <h3>Data & Security</h3>
+        <p class="small">Paw Note 데이터와 PIN을 관리할 수 있어요.</p>
+        <div class="btn-row">
+          <button id="resetPinBtn" class="outline">PIN 다시 설정</button>
+          <button id="clearDataBtn" class="outline">모든 일기 삭제</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 하단 네비게이션 -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-view="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+      </button>
+      <button class="nav-btn" data-view="calendar">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Calendar</span>
+      </button>
+      <button class="nav-btn" data-view="photos">
+        <span class="nav-icon">📷</span>
+        <span class="nav-label">Photos</span>
+      </button>
+      <button class="nav-btn" data-view="more">
+        <span class="nav-icon">✨</span>
+        <span class="nav-label">More</span>
+      </button>
+    </nav>
+  </div>
+</body>
+</html>

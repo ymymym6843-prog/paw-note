@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>나의 일기장</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- PDF 내보내기용 jsPDF (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- 메인 JS -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <!-- 🔐 PIN 잠금 화면 -->
+  <div id="lockScreen" class="card">
+    <h2>나의 일기장 잠금</h2>
+    <div id="lockStepSetup">
+      <p class="small">
+        처음이라면 PIN을 설정해 주세요. (숫자 4자리 추천)
+      </p>
+      <div class="row">
+        <label for="newPin">새 PIN</label>
+        <input type="password" id="newPin" maxlength="10" />
+      </div>
+      <div class="row">
+        <label for="newPinConfirm">확인</label>
+        <input type="password" id="newPinConfirm" maxlength="10" />
+      </div>
+      <div class="btn-row">
+        <button id="setPinBtn" class="primary">PIN 설정</button>
+      </div>
+    </div>
+
+    <div id="lockStepEnter" style="display:none;">
+      <p class="small">
+        PIN을 입력해서 일기장을 열어주세요.
+      </p>
+      <div class="row">
+        <label for="enterPin">PIN</label>
+        <input type="password" id="enterPin" maxlength="10" />
+      </div>
+      <div class="btn-row">
+        <button id="unlockBtn" class="primary">잠금 해제</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📓 실제 일기장 앱 -->
+  <div id="app" class="card">
+    <!-- 상단: 제목 + 다크모드 -->
+    <div class="header-row">
+      <h1>나의 일기장</h1>
+      <button id="themeToggle" class="outline small-btn">🌙 다크모드</button>
+    </div>
+
+    <!-- 검색 -->
+    <div class="row">
+      <label for="searchInput">검색</label>
+      <input type="text" id="searchInput" placeholder="내용 / 날짜 / 감정으로 검색" />
+    </div>
+
+    <!-- 날짜 + 감정 -->
+    <div class="row">
+      <label for="dateInput">날짜</label>
+      <input type="date" id="dateInput" />
+    </div>
+
+    <div class="row">
+      <label for="emotionSelect">감정</label>
+      <select id="emotionSelect">
+        <option value="happy">😊 행복</option>
+        <option value="neutral">😐 보통</option>
+        <option value="sad">😢 슬픔</option>
+      </select>
+    </div>
+
+    <!-- 텍스트 일기 -->
+    <div class="section-title">텍스트 일기</div>
+    <textarea id="contentInput" placeholder="오늘은 어땠는지 적어볼까?"></textarea>
+
+    <!-- 그림일기 -->
+    <div class="section-title">그림일기</div>
+    <div id="drawingContainer">
+      <!-- 모드 버튼 -->
+      <div class="toolbar">
+        <span>모드:</span>
+        <button id="drawModeBtn" class="outline mode-btn active">✏️ 그리기</button>
+        <button id="stickerModeBtn" class="outline mode-btn">⭐ 스티커</button>
+        <span class="small" id="modeHint">손가락/마우스로 자유롭게 그리기</span>
+      </div>
+
+      <canvas id="drawingCanvas"></canvas>
+
+      <!-- 그리기 툴 -->
+      <div class="toolbar">
+        <label>색상
+          <input type="color" id="colorPicker" value="#111827" />
+        </label>
+        <label>두께
+          <input type="range" id="brushSize" min="1" max="20" value="4" />
+        </label>
+        <button id="undoBtn" class="outline">↩ 되돌리기</button>
+        <button id="redoBtn" class="outline">↪ 다시하기</button>
+        <button id="clearCanvasBtn" class="outline">전체 그림 지우기</button>
+        <button id="exportPngBtn" class="outline">PNG로 저장</button>
+      </div>
+
+      <!-- 스티커 툴 -->
+      <div class="toolbar">
+        <span>스티커 패널:</span>
+        <div class="sticker-panel-buttons">
+          <button class="outline sticker-emoji-btn" data-emoji="😊">😊</button>
+          <button class="outline sticker-emoji-btn" data-emoji="🌧️">🌧️</button>
+          <button class="outline sticker-emoji-btn" data-emoji="⭐">⭐</button>
+          <button class="outline sticker-emoji-btn" data-emoji="❤️">❤️</button>
+          <button class="outline sticker-emoji-btn" data-emoji="🍀">🍀</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <span>PNG 스티커:</span>
+        <input type="file" id="stickerUpload" accept="image/png" style="display:none;">
+        <button id="uploadStickerBtn" class="outline">PNG 불러오기</button>
+        <button id="deleteStickerBtn" class="outline">선택 스티커 삭제</button>
+        <span class="small">(스티커를 클릭하면 선택·이동 가능)</span>
+      </div>
+
+      <p class="small">
+        👉 <b>스티커 모드</b>일 때 캔버스를 클릭하면 스티커를 붙이거나 선택할 수 있어요.<br>
+        👉 PNG 파일을 캔버스로 바로 <b>드래그&드롭</b>해도 스티커처럼 붙습니다.
+      </p>
+    </div>
+
+    <!-- 버튼들 -->
+    <div class="btn-row">
+      <button id="saveBtn" class="primary" style="flex:1;">저장하기</button>
+      <button id="newEntryBtn" class="outline">새 일기</button>
+    </div>
+
+    <!-- 내보내기 -->
+    <div class="section-title">내보내기 / 백업</div>
+    <div class="btn-row">
+      <button id="exportTxtBtn" class="outline">텍스트로 내보내기</button>
+      <button id="exportPdfBtn" class="outline">PDF로 내보내기</button>
+    </div>
+    <p class="small">
+      백업 파일은 본인만 보이는 곳에 잘 보관해 주세요.
+    </p>
+
+    <!-- 목록 -->
+    <div class="list-title">📚 저장된 일기</div>
+    <ul id="list"></ul>
+  </div>
+</body>
+</html>
