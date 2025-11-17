@@ -255,6 +255,34 @@ const stickerEmojiButtons = document.querySelectorAll(".sticker-emoji-btn");
 const builtInStickerImages = {
   "paw_foot": pawFootStickerImage,
 };
+const builtInStickerKeys = Object.keys(builtInStickerImages);
+
+function getFileNameFromPath(path) {
+  if (!path) return null;
+  const clean = path.split("?")[0];
+  const parts = clean.split("/");
+  return parts.length ? parts[parts.length - 1].toLowerCase() : null;
+}
+
+function getBuiltInStickerKeyForImage(image) {
+  if (!image) return null;
+  return (
+    builtInStickerKeys.find(
+      (key) => builtInStickerImages[key].src === image.src
+    ) || null
+  );
+}
+
+function findBuiltInStickerKeyFromSrc(src) {
+  const targetFile = getFileNameFromPath(src);
+  if (!targetFile) return null;
+  return (
+    builtInStickerKeys.find((key) => {
+      const builtInFile = getFileNameFromPath(builtInStickerImages[key].src);
+      return builtInFile === targetFile;
+    }) || null
+  );
+}
 const stickerUpload = document.getElementById("stickerUpload");
 const uploadStickerBtn = document.getElementById("uploadStickerBtn");
 const deleteStickerBtn = document.getElementById("deleteStickerBtn");
@@ -615,15 +643,22 @@ function createStickerAt(pos) {
 }
 
 function getStickersForStorage(stickers) {
-  return stickers.map(s => {
-    if (s.type === 'image' && s.image instanceof HTMLImageElement) {
-      // Image 객체를 src (data URL)로 변환하여 저장
+  return stickers.map((s) => {
+    if (s.type === "image" && s.image instanceof HTMLImageElement) {
+      const builtInKey = getBuiltInStickerKeyForImage(s.image);
+      if (builtInKey) {
+        return {
+          ...s,
+          builtInKey,
+          imageSrc: undefined,
+          image: undefined,
+        };
+      }
       return { ...s, imageSrc: s.image.src, image: undefined };
     }
     return s;
   });
 }
-
 function getStickersFromStorage(stickersFromStorage) {
   // imageSrc를 실제 Image 객체로 변환하는 로직은 loadDiaryToEditor에서 처리
   return stickersFromStorage ? JSON.parse(JSON.stringify(stickersFromStorage)) : [];
@@ -897,15 +932,27 @@ function loadDiaryToEditor(item) {
 
   // 저장된 스티커 데이터(imageSrc 포함)를 실제 Image 객체로 변환
   const stickersFromStorage = item.stickers || [];
-  const stickerPromises = stickersFromStorage.map(s => {
-    if (s.type === 'image' && s.imageSrc) {
-      return new Promise(resolve => {
-        const stickerImg = new Image();
-        stickerImg.onload = () => {
-          resolve({ ...s, image: stickerImg, imageSrc: undefined });
-        };
-        stickerImg.src = s.imageSrc;
-      });
+  const stickerPromises = stickersFromStorage.map((s) => {
+    if (s.type === "image") {
+      const storedBuiltInKey =
+        s.builtInKey || findBuiltInStickerKeyFromSrc(s.imageSrc);
+      if (storedBuiltInKey && builtInStickerImages[storedBuiltInKey]) {
+        return Promise.resolve({
+          ...s,
+          image: builtInStickerImages[storedBuiltInKey],
+          imageSrc: undefined,
+          builtInKey: storedBuiltInKey,
+        });
+      }
+      if (s.imageSrc) {
+        return new Promise((resolve) => {
+          const stickerImg = new Image();
+          stickerImg.onload = () => {
+            resolve({ ...s, image: stickerImg, imageSrc: undefined });
+          };
+          stickerImg.src = s.imageSrc;
+        });
+      }
     }
     return Promise.resolve(s);
   });

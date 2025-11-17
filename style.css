@@ -971,6 +971,24 @@ body.dark .thumb {
 
 /* 반응형 */
 
+@media (max-width: 640px) {
+  .filter-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 12px;
+  }
+
+  .filter-row .filter-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-row .filter-item input,
+  .filter-row .filter-item select {
+    width: 100%;
+  }
+}
+
 @media (max-width: 480px) {
   .card {
     margin: 16px;
