@@ -167,7 +167,7 @@ textarea {
 .filter-row {
   display: flex;
   align-items: center;
-  flex-wrap: nowrap; /* 한 줄 레이아웃을 위해 줄바꿈 방지 */
+  flex-wrap: wrap; /* 화면이 좁아지면 줄바꿈 허용 */
   gap: 8px 10px; /* 세로 간격, 가로 간격 */
   padding: 10px 12px;
   border-radius: 18px;
@@ -180,47 +180,24 @@ textarea {
   display: flex;
   align-items: center; /* 라벨과 입력을 같은 줄에 배치 */
   gap: 6px;
-  flex-shrink: 0; /* 기본적으로 아이템이 줄어들지 않도록 설정 */
 }
 
 .filter-item.filter-search {
-  flex: 1 1 auto; /* PC: 유연하게 늘어나고 줄어들도록 설정 */
-  min-width: 80px; /* PC: 최소 너비 보장 */
+  flex: 1 1 150px; /* 기본 너비 설정 */
 }
 
 .filter-item.filter-date,
 .filter-item.filter-weather {
-  flex: 0 0 auto; /* PC: 고유 너비를 유지하고 줄어들지 않음 */
+  flex: 1 1 130px; /* 기본 너비 설정 */
 }
 
 .filter-item.filter-emotion {
-  flex: 0 0 180px; /* PC: 너비를 180px로 고정하고 줄어들지 않음 */
-  justify-content: center; /* 중앙 정렬 */
+  flex: 1 1 180px; /* 기본 너비 설정 */
 }
 
 /* 필터바 안의 라벨은 숨기기 */
 .filter-row .filter-item label {
   display: none; /* 기존 숨김 처리 유지 */
-}
-
-/* 모바일 화면 (520px 이하)에서 필터바 레이아웃 조정 */
-@media (max-width: 520px) {
-  .filter-row {
-    flex-wrap: wrap; /* 2줄 배치를 위해 wrap 허용 */
-    gap: 8px; /* 일관된 간격 적용 */
-  }
-  .filter-item.filter-search {
-    flex: 1 1 55%; /* 1번째 줄: 검색창 (55% 너비) */
-  }
-  .filter-item.filter-date {
-    flex: 1 1 35%; /* 1번째 줄: 날짜 (35% 너비) */
-  }
-  .filter-item.filter-weather {
-    flex: 0 0 auto; /* 2번째 줄: 날씨 (내용만큼 너비) */
-  }
-  .filter-item.filter-emotion {
-    flex: 1 1 auto; /* 2번째 줄: 감정 (남은 공간 차지) */
-  }
 }
 
 /* 버튼 */
@@ -959,6 +936,7 @@ body.dark .thumb {
 
 .stats-bar {
   flex: 1;
+  max-width: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
