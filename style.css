@@ -206,19 +206,20 @@ textarea {
 /* 모바일 화면 (520px 이하)에서 필터바 레이아웃 조정 */
 @media (max-width: 520px) {
   .filter-row {
-    flex-wrap: wrap; /* 여러 줄로 나뉘도록 허용 */
+    flex-wrap: wrap; /* 2줄 배치를 위해 wrap 허용 */
+    gap: 8px; /* 일관된 간격 적용 */
   }
   .filter-item.filter-search {
-    flex: 1 1 55%; /* 검색창이 너비의 55% 차지 */
+    flex: 1 1 55%; /* 1번째 줄: 검색창 (55% 너비) */
   }
   .filter-item.filter-date {
-    flex: 1 1 35%; /* 날짜 선택이 남은 공간 차지 */
+    flex: 1 1 35%; /* 1번째 줄: 날짜 (35% 너비) */
   }
   .filter-item.filter-weather {
-    flex: 1 1 45%; /* 날씨 선택이 너비의 45% 차지 */
+    flex: 0 0 auto; /* 2번째 줄: 날씨 (내용만큼 너비) */
   }
   .filter-item.filter-emotion {
-    flex: 1 1 45%; /* 감정 선택이 남은 공간 차지 */
+    flex: 1 1 auto; /* 2번째 줄: 감정 (남은 공간 차지) */
   }
 }
 
@@ -958,7 +959,6 @@ body.dark .thumb {
 
 .stats-bar {
   flex: 1;
-  max-width: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
