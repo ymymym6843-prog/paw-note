@@ -1,4 +1,4 @@
-const CACHE_NAME = 'paw-note-cache-v2'; // 버전을 올립니다!
+const CACHE_NAME = 'paw-note-cache-v3'; // 버전을 올립니다!
 
 
 // 앱 설치 시 캐싱할 파일 목록
@@ -40,15 +40,15 @@ const urlsToCache = [ // 경로 수정
   './images/cat/hat_navy_knit.png',
   './images/cat/hat_pink_knit.png',
   './images/cat/hat_skyblue_knit.png',
-  './images/cat/accessory/acc_baseball.png',
-  './images/cat/accessory/acc_bow_tie.png',
-  './images/cat/accessory/acc_churu.png',
-  './images/cat/accessory/acc_crown.png',
-  './images/cat/accessory/acc_hairpin.png',
-  './images/cat/accessory/acc_mouse_toy.png',
-  './images/cat/accessory/acc_rabbit_doll.png',
-  './images/cat/accessory/acc_teddy_bear.png',
-  './images/cat/accessory/acc_yarnball.png'
+  './images/cat/acc_baseball.png',
+  './images/cat/acc_bow_tie.png',
+  './images/cat/acc_churu.png',
+  './images/cat/acc_crown.png',
+  './images/cat/acc_hairpin.png',
+  './images/cat/acc_mouse_toy.png',
+  './images/cat/acc_rabbit_doll.png',
+  './images/cat/acc_teddy_bear.png',
+  './images/cat/acc_yarnball.png'
 ];
 
 // 서비스 워커 설치 이벤트

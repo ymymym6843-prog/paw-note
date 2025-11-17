@@ -167,7 +167,7 @@ textarea {
 .filter-row {
   display: flex;
   align-items: center;
-  flex-wrap: wrap; /* 화면이 좁아지면 줄바꿈 허용 */
+  flex-wrap: nowrap; /* 한 줄 레이아웃을 위해 줄바꿈 방지 */
   gap: 8px 10px; /* 세로 간격, 가로 간격 */
   padding: 10px 12px;
   border-radius: 18px;
@@ -180,20 +180,24 @@ textarea {
   display: flex;
   align-items: center; /* 라벨과 입력을 같은 줄에 배치 */
   gap: 6px;
+  flex-shrink: 0; /* 기본적으로 아이템이 줄어들지 않도록 설정 */
 }
 
 .filter-item.filter-search {
-  flex: 1 1 120px; /* 너비 축소 */
+  flex-grow: 1; /* 남는 공간을 모두 차지 */
+  flex-shrink: 1; /* 공간이 부족할 때 줄어들도록 허용 */
+  min-width: 80px; /* 최소 너비 보장 */
 }
 
 .filter-item.filter-date,
 .filter-item.filter-weather {
-  flex: 1 1 120px; /* 너비 축소 */
+  flex-basis: auto; /* 내용에 맞게 너비 자동 조절 */
 }
 
 .filter-item.filter-emotion {
-  flex: 0 0 180px; /* 너비 고정 */
-  min-width: 180px;
+  flex-shrink: 0; /* 줄어들지 않도록 고정 */
+  width: 180px; /* 너비 고정 */
+  justify-content: center; /* 중앙 정렬 */
 }
 
 /* 필터바 안의 라벨은 숨기기 */

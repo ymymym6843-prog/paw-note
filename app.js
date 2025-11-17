@@ -973,9 +973,10 @@ function renderList() {
 
     const thumb = document.createElement("div");
     thumb.className = "thumb";
-    if (item.baseImageData) { // BUG FIX: imageData -> baseImageData
+    const displayImage = item.imageData || item.baseImageData;
+    if (displayImage) {
       const img = document.createElement("img");
-      img.src = item.baseImageData;
+      img.src = displayImage;
       thumb.appendChild(img);
     } else {
       const img = document.createElement("img");
@@ -1016,7 +1017,8 @@ function renderPhotoGrid() {
 
   diaryGrid.innerHTML = "";
   const diaries = loadDiaries()
-    .filter((item) => item.baseImageData) // BUG FIX: imageData -> baseImageData
+    // imageData(합성본) 또는 baseImageData(원본)가 있는 경우
+    .filter((item) => item.imageData || item.baseImageData)
     .sort((a, b) => b.date.localeCompare(a.date));
 
   if (diaries.length === 0) {
@@ -1028,8 +1030,9 @@ function renderPhotoGrid() {
     diaries.forEach((item) => {
       const photo = document.createElement("div");
       photo.className = "photo-item";
+      const displayImage = item.imageData || item.baseImageData;
       const img = document.createElement("img");
-      img.src = item.baseImageData; // BUG FIX: imageData -> baseImageData
+      img.src = displayImage;
       img.alt = `${item.date} diary drawing`;
       photo.appendChild(img);
 
@@ -1095,7 +1098,7 @@ saveBtn.addEventListener("click", () => {
   const emotion = selectedEmotion || 5;
   const weather = weatherSelect.value || "sunny";
 
-  renderAll(); // 최종 상태를 렌더링합니다.
+  renderAllAndSave(); // 최종 상태를 렌더링하고 canvasState.currentImageData에 저장
 
   if (!content && isBaseCanvasEmpty() && stickerState.stickers.length === 0) {
     alert("텍스트나 그림 중 하나는 입력해 주세요.");
@@ -1110,6 +1113,7 @@ saveBtn.addEventListener("click", () => {
     content,
     emotion,
     weather, // 캔버스가 비어있으면(초기 흰색 상태) null로 저장
+    imageData: isCanvasEmpty() ? null : canvasState.currentImageData, // 스티커 포함된 최종 이미지
     baseImageData: isBaseCanvasEmpty() ? null : baseCanvas.toDataURL(),
     stickers: getStickersForStorage(stickerState.stickers), // 저장 가능한 형태로 변환
   };
@@ -1414,7 +1418,12 @@ async function loadCatPartImage(part, value) {
       resolve();
     };
     img.onerror = reject;
-    img.src = `./images/cat/${value}.png`; // 경로 수정
+    // 액세서리는 하위 폴더에 있으므로 경로를 분기합니다.
+    if (part === 'accessory') {
+      img.src = `./images/cat/accessory/${value}.png`;
+    } else {
+      img.src = `./images/cat/${value}.png`;
+    }
   });
 }
 
