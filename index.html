@@ -138,20 +138,20 @@
       </div>
 
       <!-- 텍스트 일기 (타이틀 텍스트는 생략) -->
-      <div class="notepaper">
-        <textarea
-          id="contentInput"
-          placeholder=" 오늘 하루는 어땠나요? "
-        ></textarea>
+      <div class="textarea-container">
+        <div class="notepaper">
+          <textarea
+            id="contentInput"
+            placeholder=" 오늘 하루는 어땠나요? "
+          ></textarea>
+        </div>
       </div>
 
       <!-- 그림일기 (타이틀 텍스트는 생략) -->
       <div id="drawingContainer">
-        <!-- 모드 버튼 -->
+        <!-- 모드 토글 버튼 -->
         <div class="toolbar">
-          <span>모드</span>
-          <button id="drawModeBtn" class="outline mode-btn active">✏️ 그리기</button>
-          <button id="stickerModeBtn" class="outline mode-btn">⭐ 스티커</button>
+          <button id="modeToggleBtn" class="outline mode-toggle">✏️ 그리기</button>
           <span class="small" id="modeHint">손가락/마우스로 자유롭게 그리기</span>
         </div>
 

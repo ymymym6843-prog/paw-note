@@ -1,4 +1,4 @@
-﻿// ===================
+﻿﻿// ===================
 // 상수 / 공통 유틸
 // ===================
 const STORAGE_KEY = "diaries_v2";
@@ -247,8 +247,7 @@ const clearCanvasBtn = document.getElementById("clearCanvasBtn");
 const undoBtn = document.getElementById("undoBtn");
 const redoBtn = document.getElementById("redoBtn");
 
-const drawModeBtn = document.getElementById("drawModeBtn");
-const stickerModeBtn = document.getElementById("stickerModeBtn");
+const modeToggleBtn = document.getElementById("modeToggleBtn");
 const modeHint = document.getElementById("modeHint");
 
 const stickerEmojiButtons = document.querySelectorAll(".sticker-emoji-btn");
@@ -540,12 +539,12 @@ function getPos(e) {
 function setMode(newMode) {
   canvasState.mode = newMode;
   if (canvasState.mode === "draw") {
-    drawModeBtn.classList.add("active");
-    stickerModeBtn.classList.remove("active");
+    modeToggleBtn.textContent = "✏️ 그리기";
+    modeToggleBtn.classList.remove("active");
     modeHint.textContent = "손가락/마우스로 자유롭게 그리기";
   } else {
-    stickerModeBtn.classList.add("active");
-    drawModeBtn.classList.remove("active");
+    modeToggleBtn.textContent = "⭐ 스티커";
+    modeToggleBtn.classList.add("active");
     modeHint.textContent =
       "스티커를 선택하고 캔버스를 클릭해 붙이거나 이동 / 크기 조절";
   }
@@ -895,10 +894,11 @@ clearCanvasBtn.addEventListener("click", () => {
   stickerState.selectedStickerIndex = null;
   commitState();
 });
-
 // 모드 버튼
-drawModeBtn.addEventListener("click", () => setMode("draw"));
-stickerModeBtn.addEventListener("click", () => setMode("sticker"));
+modeToggleBtn.addEventListener("click", () => {
+  const nextMode = canvasState.mode === "draw" ? "sticker" : "draw";
+  setMode(nextMode);
+});
 
 // ===================
 // 공통: 에디터에 일기 로딩
@@ -958,8 +958,9 @@ function loadDiaryToEditor(item) {
   });
 
   Promise.all(stickerPromises).then(loadedStickers => {
-    stickerState.stickers = loadedStickers;
-    renderAll(); // 그림과 스티커를 모두 다시 그립니다.
+    stickerState.stickers = loadedStickers; // 로드된 스티커로 상태 업데이트
+    resetHistoryWithCurrent(); // 스티커 포함된 상태로 히스토리 초기화
+    renderAll(); // 모든 스티커가 로드된 후 최종적으로 캔버스를 다시 그립니다.
   });
 
   showView("home");
