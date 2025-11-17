@@ -1,4 +1,5 @@
-﻿﻿* { box-sizing: border-box; }
+﻿* { box-sizing: border-box; }
+﻿* { box-sizing: border-box; }
 
 :root {
   --paw-bg: #fef9fb;
@@ -703,6 +704,9 @@ body.dark .thumb {
   position: absolute;
   bottom: 2px;
   right: 4px;
+  width: 12px;
+  height: 12px;
+  background-image: url('images/paw_foot.png');
   width: 14px;
   height: 14px;
   background-image: url('./images/paw_foot.png');
