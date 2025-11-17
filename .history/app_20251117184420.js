@@ -431,7 +431,7 @@ function renderAllAndSave() {
 // ===================
 function resetHistoryWithCurrent() {
   const state = {
-    baseImageData: baseCanvas.toDataURL("image/png"), // 스티커를 제외한 순수 그림 데이터만 저장
+    imageData: canvas.toDataURL("image/png"),
     stickers: JSON.parse(JSON.stringify(stickerState.stickers)), // 스티커 상태를 깊은 복사하여 저장
   };
   canvasState.history = [state];
@@ -439,9 +439,9 @@ function resetHistoryWithCurrent() {
 }
 
 function commitState() {
-  renderAll(); // 최종 렌더링만 하고, 저장 로직은 아래로 분리
+  renderAllAndSave();
   const state = {
-    baseImageData: baseCanvas.toDataURL("image/png"), // 스티커를 제외한 순수 그림 데이터만 저장
+    imageData: canvasState.currentImageData,
     stickers: JSON.parse(JSON.stringify(stickerState.stickers)), // 스티커 상태를 깊은 복사하여 저장
   };
 
@@ -462,6 +462,7 @@ function restoreFromHistory(index) {
   const state = canvasState.history[index];
   if (!state) return;
 
+  canvasState.currentImageData = state.imageData;
   stickerState.stickers = JSON.parse(JSON.stringify(state.stickers)); // 저장된 스티커 상태 복원
   stickerState.selectedStickerIndex = null;
 
@@ -470,7 +471,8 @@ function restoreFromHistory(index) {
     baseCtx.drawImage(img, 0, 0, baseCanvas.width, baseCanvas.height);
     renderAll();
   };
-  img.src = state.baseImageData; // 스티커가 없는 순수 그림 데이터를 로드
+  img.src = imgData;
+  img.src = state.imageData; // 버그 수정: 정의되지 않은 imgData 대신 state.imageData를 사용합니다.
 }
 
 undoBtn.addEventListener("click", () => {
