@@ -523,6 +523,14 @@ function setMode(newMode) {
   }
 }
 
+let hintTimeout;
+function showTemporaryHint(message, duration = 2000) {
+  clearTimeout(hintTimeout);
+  modeHint.textContent = message;
+  hintTimeout = setTimeout(() => {
+    setMode(canvasState.mode); // 원래 모드 힌트로 복원
+  }, duration);
+}
 // ===================
 // ✏️ 그리기 모드
 // ===================
@@ -606,6 +614,21 @@ function createStickerAt(pos) {
   commitState();
 }
 
+function getStickersForStorage(stickers) {
+  return stickers.map(s => {
+    if (s.type === 'image' && s.image instanceof HTMLImageElement) {
+      // Image 객체를 src (data URL)로 변환하여 저장
+      return { ...s, imageSrc: s.image.src, image: undefined };
+    }
+    return s;
+  });
+}
+
+function getStickersFromStorage(stickersFromStorage) {
+  // imageSrc를 실제 Image 객체로 변환하는 로직은 loadDiaryToEditor에서 처리
+  return stickersFromStorage ? JSON.parse(JSON.stringify(stickersFromStorage)) : [];
+}
+
 function handleStickerDown(e) {
   const pos = getPos(e);
   const hitIndex = findStickerAt(pos);
@@ -675,7 +698,7 @@ stickerEmojiButtons.forEach((btn) => {
       selectedStickerImage = stickerImage;
       selectedStickerEmoji = null;
       setMode("sticker");
-      alert("발바닥 스티커가 선택되었습니다. 캔버스를 클릭하면 붙일 수 있어요.");
+      showTemporaryHint("🐾 발바닥 스티커 선택됨!");
       return;
     }
     const emoji = btn.getAttribute("data-emoji");
@@ -683,7 +706,7 @@ stickerEmojiButtons.forEach((btn) => {
     selectedStickerEmoji = emoji;
     selectedStickerImage = null;
     setMode("sticker");
-    alert(`스티커 "${emoji}" 선택됨. 캔버스를 클릭하면 붙일 수 있어요.`);
+    showTemporaryHint(`스티커 "${emoji}" 선택됨!`);
   });
 });
 
@@ -706,7 +729,7 @@ stickerUpload.addEventListener("change", (e) => {
       selectedStickerImage = img;
       selectedStickerEmoji = null;
       setMode("sticker");
-      alert("PNG 스티커가 선택되었습니다. 캔버스를 클릭하면 붙일 수 있어요.");
+      showTemporaryHint("PNG 스티커 선택됨!");
     };
     img.src = event.target.result;
   };
@@ -848,8 +871,7 @@ function loadDiaryToEditor(item) {
   contentInput.value = item.content || "";
 
   const imgData = item.imageData || null;
-  // 저장된 스티커 데이터가 있으면 불러오고, 없으면 빈 배열로 초기화합니다.
-  stickerState.stickers = item.stickers ? JSON.parse(JSON.stringify(item.stickers)) : [];
+  stickerState.stickers = []; // 우선 비우기
   stickerState.selectedStickerIndex = null;
 
   // imageData는 이제 baseImageData(순수 그림)를 의미합니다.
@@ -859,14 +881,33 @@ function loadDiaryToEditor(item) {
       baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
       baseCtx.drawImage(img, 0, 0, baseCanvas.width, baseCanvas.height);
       resetHistoryWithCurrent();
-      renderAll(); // 그림과 스티커를 모두 다시 그립니다.
+      // 스티커 로드 후 최종 렌더링
     };
     img.src = item.baseImageData;
   } else {
     clearBaseLayer();
     resetHistoryWithCurrent();
-    renderAll();
   }
+
+  // 저장된 스티커 데이터(imageSrc 포함)를 실제 Image 객체로 변환
+  const stickersFromStorage = item.stickers || [];
+  const stickerPromises = stickersFromStorage.map(s => {
+    if (s.type === 'image' && s.imageSrc) {
+      return new Promise(resolve => {
+        const stickerImg = new Image();
+        stickerImg.onload = () => {
+          resolve({ ...s, image: stickerImg, imageSrc: undefined });
+        };
+        stickerImg.src = s.imageSrc;
+      });
+    }
+    return Promise.resolve(s);
+  });
+
+  Promise.all(stickerPromises).then(loadedStickers => {
+    stickerState.stickers = loadedStickers;
+    renderAll(); // 그림과 스티커를 모두 다시 그립니다.
+  });
 
   showView("home");
 }
@@ -1070,7 +1111,7 @@ saveBtn.addEventListener("click", () => {
     emotion,
     weather, // 캔버스가 비어있으면(초기 흰색 상태) null로 저장
     baseImageData: isBaseCanvasEmpty() ? null : baseCanvas.toDataURL(),
-    stickers: stickerState.stickers,
+    stickers: getStickersForStorage(stickerState.stickers), // 저장 가능한 형태로 변환
   };
 
   if (idx >= 0) {
@@ -1087,17 +1128,13 @@ saveBtn.addEventListener("click", () => {
 });
 
 newEntryBtn.addEventListener("click", () => {
-  setToday();
-  weatherSelect.value = "sunny";
-  contentInput.value = "";
-  canvasState.currentImageData = null;
-  stickerState.stickers = [];
-  stickerState.selectedStickerIndex = null;
-  clearBaseLayer();
-  resetHistoryWithCurrent();
-  renderAll();
+  // loadDiaryToEditor를 재사용하여 초기화 로직을 통일합니다.
+  loadDiaryToEditor({
+    date: new Date().toISOString().slice(0, 10),
+    emotion: 5,
+    weather: "sunny",
+  });
   setMode("draw");
-  setPawRating(5);
 });
 
 // ===================
@@ -1333,7 +1370,7 @@ const catImageSources = {
   fur: ["fur_tuxedo", "fur_calico", "fur_short_silver", "fur_siamese", "fur_white"],
   eyes: ["eyes_blue", "eyes_amber", "eyes_oddeye"],
   hat: ["none", "hat_pink_knit", "hat_green_knit", "hat_skyblue_knit", "hat_navy_knit"],
-  accessory: ["none", "acc_baseball", "acc_bow_tie", "acc_churu", "acc_crown",  "acc_hairpin", "acc_mouse_toy", "acc_rabbit-doll", "acc_teddy_bear", "acc_yarnball"],
+  accessory: ["none", "acc_baseball", "acc_bow_tie", "acc_churu", "acc_crown",  "acc_hairpin", "acc_mouse_toy", "acc_rabbit_doll", "acc_teddy_bear", "acc_yarnball"],
 };
 const catOptionLabels = {
   bg: { "bg_cozy_room": "아늑한 방", "bg_forest_path": "숲길", "bg_library": "도서관", "bg_magical_landscape": "마법 풍경", "bg_night_road": "어두운 밤", "bg_starry_night": "우주", "bg_sunny_lawn": "햇살가득 공원" },
@@ -1341,7 +1378,7 @@ const catOptionLabels = {
   fur: { "fur_tuxedo": "턱시도", "fur_calico": "치즈", "fur_short_silver": "실버", "fur_siamese": "샴", "fur_white": "화이트" },
   eyes: { "eyes_blue": "블루", "eyes_amber": "옐로우", "eyes_oddeye": "오드아이" },
   hat: { "none": "없음", "hat_pink_knit": "핑크", "hat_skyblue_knit": "스카이블루", "hat_green_knit": "그린", "hat_navy_knit": "네이비" },
-  accessory: { "none": "없음", "acc_baseball": "야구 모자", "acc_bow_tie": "보타이", "acc_churu": "츄르", "acc_crown": "왕관", "acc_hairpin": "머리핀", "acc_mouse_toy": "쥐 장난감", "acc_rabbit-doll": "토끼 인형", "acc_teddy_bear": "곰 인형", "acc_yarnball": "실뭉치" },
+  accessory: { "none": "없음", "acc_baseball": "야구공", "acc_bow_tie": "보타이", "acc_churu": "츄르", "acc_crown": "왕관", "acc_hairpin": "머리핀", "acc_mouse_toy": "쥐 장난감", "acc_rabbit_doll": "토끼 인형", "acc_teddy_bear": "곰 인형", "acc_yarnball": "실뭉치" },
 };
 const catPartLabels = {
   bg: "배경", cushion: "쿠션", fur: "털", eyes: "눈", hat: "모자", accessory: "액세서리"

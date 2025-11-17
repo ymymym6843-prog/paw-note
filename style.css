@@ -1,4 +1,4 @@
-﻿﻿* { box-sizing: border-box; }
+﻿﻿﻿* { box-sizing: border-box; }
 
 :root {
   --paw-bg: #fef9fb;
@@ -167,8 +167,8 @@ textarea {
 .filter-row {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-wrap: wrap; /* 화면이 좁아지면 줄바꿈 허용 */
+  gap: 8px 10px; /* 세로 간격, 가로 간격 */
   padding: 10px 12px;
   border-radius: 18px;
   background: rgba(255, 248, 252, 0.9);
@@ -178,46 +178,27 @@ textarea {
 
 .filter-item {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1 1 160px;
-  min-width: 130px;
+  align-items: center; /* 라벨과 입력을 같은 줄에 배치 */
+  gap: 6px;
 }
 
 .filter-item.filter-search {
-  flex: 1 1 220px;
-  max-width: 260px;
+  flex: 1 1 120px; /* 너비 축소 */
 }
 
 .filter-item.filter-date,
 .filter-item.filter-weather {
-  flex: 0 1 120px;
-  max-width: 140px;
+  flex: 1 1 120px; /* 너비 축소 */
 }
 
 .filter-item.filter-emotion {
-  flex: 1 1 200px;
-  min-width: 200px;
+  flex: 0 0 180px; /* 너비 고정 */
+  min-width: 180px;
 }
 
 /* 필터바 안의 라벨은 숨기기 */
 .filter-row .filter-item label {
-  display: none;
-}
-
-@media (max-width: 640px) {
-  .filter-row {
-    flex-direction: column;
-  }
-
-  .filter-item,
-  .filter-item.filter-search,
-  .filter-item.filter-date,
-  .filter-item.filter-weather,
-  .filter-item.filter-emotion {
-    max-width: 100%;
-    width: 100%;
-  }
+  display: none; /* 기존 숨김 처리 유지 */
 }
 
 /* 버튼 */
@@ -853,16 +834,11 @@ body.dark .thumb {
   box-shadow: 0 4px 10px rgba(243, 166, 194, 0.25);
   transform: translateY(-1px);
 }
-
 .cat-option-btn.active {
   background: #ffb9cf;
   border-color: #f07fa2;
   color: #8d264b;
   box-shadow: 0 6px 16px rgba(240, 127, 162, 0.35);
-}
-
-.cat-option-btn:focus-visible {
-  box-shadow: 0 0 0 2px #ffe0ea, 0 0 0 4px rgba(244, 143, 177, 0.45);
 }
 
 .cat-option-label {
