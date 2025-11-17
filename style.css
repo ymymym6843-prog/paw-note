@@ -184,23 +184,42 @@ textarea {
 }
 
 .filter-item.filter-search {
-  flex: 1 1 auto; /* 유연하게 늘어나고 줄어들도록 설정 */
-  min-width: 60px; /* 최소 너비 보장 */
+  flex: 1 1 auto; /* PC: 유연하게 늘어나고 줄어들도록 설정 */
+  min-width: 80px; /* PC: 최소 너비 보장 */
 }
 
 .filter-item.filter-date,
 .filter-item.filter-weather {
-  flex: 0 0 auto; /* 고유 너비를 유지하고 줄어들지 않음 */
+  flex: 0 0 auto; /* PC: 고유 너비를 유지하고 줄어들지 않음 */
 }
 
 .filter-item.filter-emotion {
-  flex: 0 0 180px; /* 너비를 180px로 고정하고 줄어들지 않음 */
+  flex: 0 0 180px; /* PC: 너비를 180px로 고정하고 줄어들지 않음 */
   justify-content: center; /* 중앙 정렬 */
 }
 
 /* 필터바 안의 라벨은 숨기기 */
 .filter-row .filter-item label {
   display: none; /* 기존 숨김 처리 유지 */
+}
+
+/* 모바일 화면 (520px 이하)에서 필터바 레이아웃 조정 */
+@media (max-width: 520px) {
+  .filter-row {
+    flex-wrap: wrap; /* 여러 줄로 나뉘도록 허용 */
+  }
+  .filter-item.filter-search {
+    flex-basis: 60%; /* 검색창이 너비의 60% 차지 */
+  }
+  .filter-item.filter-date {
+    flex: 1; /* 날짜 선택이 남은 공간 차지 */
+  }
+  .filter-item.filter-weather {
+    flex-basis: 50%; /* 날씨 선택이 너비의 50% 차지 */
+  }
+  .filter-item.filter-emotion {
+    flex: 1; /* 감정 선택이 남은 공간 차지 */
+  }
 }
 
 /* 버튼 */

@@ -843,6 +843,9 @@ canvas.addEventListener(
   "touchend",
   (e) => {
     handleUp(e);
+    if (canvasState.mode === "sticker") {
+      handleStickerEnd(e); // 스티커 추가 후 상태 저장을 위해 호출
+    }
   },
   { passive: false }
 );
