@@ -430,6 +430,8 @@ function renderAllAndSave() {
 // 히스토리(Undo/Redo)
 // ===================
 function resetHistoryWithCurrent() {
+  renderAllAndSave();
+  canvasState.history = [canvasState.currentImageData];
   const state = {
     imageData: canvas.toDataURL("image/png"),
     stickers: JSON.parse(JSON.stringify(stickerState.stickers)), // 스티커 상태를 깊은 복사하여 저장
@@ -448,6 +450,7 @@ function commitState() {
   if (canvasState.historyIndex < canvasState.history.length - 1) {
     canvasState.history = canvasState.history.slice(0, canvasState.historyIndex + 1);
   }
+  canvasState.history.push(canvasState.currentImageData);
   canvasState.history.push(state);
   canvasState.historyIndex = canvasState.history.length - 1;
 
@@ -459,15 +462,20 @@ function commitState() {
 }
 
 function restoreFromHistory(index) {
+  const imgData = canvasState.history[index];
+  if (!imgData) return;
   const state = canvasState.history[index];
   if (!state) return;
 
+  canvasState.currentImageData = imgData;
+  stickerState.stickers = [];
   canvasState.currentImageData = state.imageData;
   stickerState.stickers = JSON.parse(JSON.stringify(state.stickers)); // 저장된 스티커 상태 복원
   stickerState.selectedStickerIndex = null;
 
   const img = new Image();
   img.onload = () => {
+    baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
     baseCtx.drawImage(img, 0, 0, baseCanvas.width, baseCanvas.height);
     renderAll();
   };
