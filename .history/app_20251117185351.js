@@ -848,10 +848,13 @@ function loadDiaryToEditor(item) {
   contentInput.value = item.content || "";
 
   const imgData = item.imageData || null;
+  canvasState.currentImageData = imgData;
+  stickerState.stickers = [];
   // 저장된 스티커 데이터가 있으면 불러오고, 없으면 빈 배열로 초기화합니다.
   stickerState.stickers = item.stickers ? JSON.parse(JSON.stringify(item.stickers)) : [];
   stickerState.selectedStickerIndex = null;
 
+  if (imgData) {
   // imageData는 이제 baseImageData(순수 그림)를 의미합니다.
   if (item.baseImageData) {
     const img = new Image();
@@ -859,8 +862,10 @@ function loadDiaryToEditor(item) {
       baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
       baseCtx.drawImage(img, 0, 0, baseCanvas.width, baseCanvas.height);
       resetHistoryWithCurrent();
+      renderAll();
       renderAll(); // 그림과 스티커를 모두 다시 그립니다.
     };
+    img.src = imgData;
     img.src = item.baseImageData;
   } else {
     clearBaseLayer();
@@ -1054,8 +1059,10 @@ saveBtn.addEventListener("click", () => {
   const emotion = selectedEmotion || 5;
   const weather = weatherSelect.value || "sunny";
 
+  commitState();
   renderAll(); // 최종 상태를 렌더링합니다.
 
+  if (!content && !canvasState.currentImageData) {
   if (!content && isBaseCanvasEmpty() && stickerState.stickers.length === 0) {
     alert("텍스트나 그림 중 하나는 입력해 주세요.");
     return;
@@ -1069,6 +1076,7 @@ saveBtn.addEventListener("click", () => {
     content,
     emotion,
     weather, // 캔버스가 비어있으면(초기 흰색 상태) null로 저장
+    imageData: isCanvasEmpty() ? null : canvasState.currentImageData,
     baseImageData: isBaseCanvasEmpty() ? null : baseCanvas.toDataURL(),
     stickers: stickerState.stickers,
   };
