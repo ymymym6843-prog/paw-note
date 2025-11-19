@@ -1,4 +1,4 @@
-﻿﻿// ===================
+﻿﻿﻿﻿// ===================
 // 상수 / 공통 유틸
 // ===================
 const STORAGE_KEY = "diaries_v2";
@@ -1472,12 +1472,8 @@ async function loadCatPartImage(part, value) {
       resolve();
     };
     img.onerror = reject;
-    // 액세서리는 하위 폴더에 있으므로 경로를 분기합니다.
-    if (part === 'accessory') {
-      img.src = `./images/cat/accessory/${value}.png`;
-    } else {
-      img.src = `./images/cat/${value}.png`;
-    }
+    // 모든 고양이 파츠 이미지는 동일한 폴더에 있습니다.
+    img.src = `./images/cat/${value}.png`;
   });
 }
 
