@@ -1,8 +1,8 @@
-const CACHE_NAME = 'paw-note-cache-v3'; // 버전을 올립니다!
+const CACHE_NAME = 'paw-note-cache-v4'; // 경로 수정 후 버전 업데이트
 
 
 // 앱 설치 시 캐싱할 파일 목록
-const urlsToCache = [ // 경로 수정
+const urlsToCache = [
   './',
   './index.html',
   './style.css',
@@ -14,41 +14,42 @@ const urlsToCache = [ // 경로 수정
   './images/paw_logo_512.png',
   './images/paw_foot.png',
   // 고양이 파츠 이미지들을 모두 캐싱합니다.
-  './images/cat/bg_cozy_room.png',
-  './images/cat/bg_forest_path.png',
-  './images/cat/bg_library.png',
-  './images/cat/bg_magical_landscape.png',
-  './images/cat/bg_night_road.png',
-  './images/cat/bg_starry_night.png',
-  './images/cat/bg_sunny_lawn.png',
-  './images/cat/cushion_blue.png',
-  './images/cat/cushion_green.png',
-  './images/cat/cushion_orange.png',
-  './images/cat/cushion_rainbow.png',
-  './images/cat/cushion_red.png',
-  './images/cat/cushion_yellow.png',
-  './images/cat/fur_calico.png',
-  './images/cat/fur_short_silver.png',
-  './images/cat/fur_siamese.png',
-  './images/cat/fur_tuxedo.png',
-  './images/cat/fur_white.png',
+  './images/cat/bg_cozy_room.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/bg_forest_path.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/bg_library.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/bg_magical_landscape.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/bg_night_road.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/bg_starry_night.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/bg_sunny_lawn.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/cushion_blue.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/cushion_green.png', // 경로 일관성을 위해 './' 추가
+a/c:\myapp\diary_re\sw.js
+  './images/cat/cushion_orange.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/cushion_rainbow.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/cushion_red.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/cushion_yellow.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/fur_calico.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/fur_short_silver.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/fur_siamese.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/fur_tuxedo.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/fur_white.png', // 경로 일관성을 위해 './' 추가
   // 누락된 고양이 파츠 이미지 추가
-  './images/cat/eyes_amber.png',
-  './images/cat/eyes_blue.png',
-  './images/cat/eyes_oddeye.png',
-  './images/cat/hat_green_knit.png',
-  './images/cat/hat_navy_knit.png',
-  './images/cat/hat_pink_knit.png',
-  './images/cat/hat_skyblue_knit.png',
-  './images/cat/acc_baseball.png',
-  './images/cat/acc_bow_tie.png',
-  './images/cat/acc_churu.png',
-  './images/cat/acc_crown.png',
-  './images/cat/acc_hairpin.png',
-  './images/cat/acc_mouse_toy.png',
-  './images/cat/acc_rabbit_doll.png',
-  './images/cat/acc_teddy_bear.png',
-  './images/cat/acc_yarnball.png'
+  './images/cat/eyes_amber.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/eyes_blue.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/eyes_oddeye.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/hat_green_knit.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/hat_navy_knit.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/hat_pink_knit.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/hat_skyblue_knit.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/acc_baseball.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/acc_bow_tie.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/acc_churu.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/acc_crown.png', // 경로 일관성을 위해 './' 추가
+  './imagescat/acc_hairpin.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/acc_mouse_toy.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/acc_rabbit_doll.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/acc_teddy_bear.png', // 경로 일관성을 위해 './' 추가
+  './images/cat/acc_yarnball.png' // 경로 일관성을 위해 './' 추가
 ];
 
 // 서비스 워커 설치 이벤트
